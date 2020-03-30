@@ -1,10 +1,10 @@
-package org.buka29a.auto.utils;
+package org.buka29a.obj.utils;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ReflectionUtils {
 
@@ -13,11 +13,7 @@ public final class ReflectionUtils {
     }
 
     public static List<String> getAllFieldsNames(Object obj) {
-        List<String> names = new ArrayList<>();
-        for (Field field : getAllFields(obj)) {
-            names.add(field.getName());
-        }
-        return names;
+        return getAllFields(obj).stream().map(Field::getName).collect(Collectors.toList());
     }
 
     public static Object getField(Object obj, String fieldName) {
@@ -41,19 +37,35 @@ public final class ReflectionUtils {
     public static Object setType(Object value, Class type) {
         if (value.getClass().isAssignableFrom(type)) {
             return value;
-        }
-        if (type.equals(String.class)) {
+        } else if (type.equals(String.class)) {
             return String.valueOf(value);
-        }
-        if (type.equals(Boolean.class)) {
+        } else if (type.equals(Boolean.class)) {
             return Boolean.valueOf((String) value);
-        }
-        if (type.equals(Integer.class)) {
+        } else if (type.equals(Integer.class)) {
             return Integer.parseInt((String) value);
-        }
-        if (type.equals(Long.class)) {
+        } else if (type.equals(Long.class)) {
             return Long.parseLong((String) value);
+        } else {
+            throw new ClassCastException(value.getClass().getCanonicalName() + " cannot be cast to " + type.getCanonicalName());
         }
-        return value;
+    }
+
+    public static Object initField(Object obj, String fieldName) {
+        Object instance = getField(obj, fieldName);
+
+        if (instance == null) {
+            Field field = FieldUtils.getField(obj.getClass(), fieldName, true);
+            try {
+                instance = Class.forName(field.getType().getName()).newInstance();
+                ReflectionUtils.setField(obj, fieldName, instance);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return instance;
     }
 }
