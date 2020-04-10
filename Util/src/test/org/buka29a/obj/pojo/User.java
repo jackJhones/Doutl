@@ -1,24 +1,26 @@
 package org.buka29a.obj.pojo;
 
+import org.buka29a.obj.format.DataField;
+import org.buka29a.obj.format.DataTable;
 import org.buka29a.obj.model.DataContainer;
+import org.buka29a.obj.type.DataType;
 
+import java.util.List;
+
+@DataTable(name = "test.user")
 public class User extends DataContainer<User> {
+    @DataField(name = "id", type = DataType.INT)
     private Integer id;
+    @DataField(name = "first_name", type = DataType.VARCHAR)
     private String firstName;
+    @DataField(name = "last_name", type = DataType.VARCHAR)
     private String lastName;
+    private Address[] addressList;
+    @DataField(name = "active", type = DataType.BOOLEAN)
     private Boolean active;
+    @DataField(name = "groups", type = DataType.VARCHAR)
+    private List<UserGroup> groupList;
     private Metadata metadata;
-
-    public User() {
-    }
-
-    public User(Integer id, String firstName, String lastName, Boolean active, Metadata metadata) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.active = active;
-        this.metadata = metadata;
-    }
 
     public Integer getId() {
         return id;
@@ -58,5 +60,21 @@ public class User extends DataContainer<User> {
 
     public void setMetadata(Metadata metadata) {
         this.metadata = metadata;
+    }
+
+    public List<UserGroup> getGroupList() {
+        return groupList;
+    }
+
+    public void setGroupList(List<UserGroup> groupList) {
+        this.groupList = groupList;
+    }
+
+    public Address[] getAddressList() {
+        return addressList;
+    }
+
+    public void setAddressList(Address[] addressList) {
+        this.addressList = addressList;
     }
 }

@@ -1,9 +1,15 @@
 package org.buka29a.obj;
 
+import org.buka29a.obj.format.DataContainerProcessor;
+import org.buka29a.obj.model.DataImage;
+import org.buka29a.obj.pojo.Address;
+import org.buka29a.obj.pojo.Metadata;
 import org.buka29a.obj.pojo.User;
+import org.buka29a.obj.pojo.UserGroup;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class DataContainerTests {
@@ -31,7 +37,8 @@ public class DataContainerTests {
 
         User actual = new User().initialize(userData);
 
-        Assert.assertEquals(new HashSet<>(Arrays.asList("id", "firstName", "lastName", "active", "metadata")),
+        Assert.assertEquals(
+                new HashSet<>(Arrays.asList("id", "firstName", "lastName", "active", "addressList", "groupList", "metadata")),
                 actual.toMap(false).keySet());
     }
 
@@ -58,7 +65,7 @@ public class DataContainerTests {
 
         User actual = new User().initialize(userData);
 
-        Assert.assertEquals(Collections.singletonList("metadata"), actual.notInitializedFields());
+        Assert.assertEquals(Arrays.asList("addressList", "groupList", "metadata"), actual.notInitializedFields());
     }
 
     @Test
@@ -96,5 +103,36 @@ public class DataContainerTests {
         Assert.assertEquals(new Integer(99), actual.getId());
         Assert.assertEquals("10-10-2001", actual.getMetadata().getCreatedDate());
         Assert.assertEquals("10-10-2002", actual.getMetadata().getUpdatedDate());
+    }
+
+    @Test
+    public void checkAnnotations() {
+        User user = new User();
+        user.setId(1000);
+        user.setFirstName("Jeff");
+        user.setLastName("Besos");
+        user.setActive(false);
+        user.setGroupList(Arrays.asList(UserGroup.AD_USER, UserGroup.ADMIN));
+
+        Address address1 = new Address();
+        address1.setCountry("USA");
+        address1.setState("New York");
+        address1.setCity("New York");
+        address1.setZip("60133");
+        Address address2 = new Address();
+        address2.setCountry("Spain");
+        address2.setState("Catalonia");
+        address2.setCity("Barcelona");
+        address2.setZip("356001");
+        user.setAddressList(new Address[]{address1, address2});
+
+        Metadata metadata = new Metadata();
+        LocalDateTime.now().toString();
+        metadata.setCreatedDate(LocalDateTime.now().toString());
+        user.setMetadata(metadata);
+
+        DataContainerProcessor processor = new DataContainerProcessor();
+        List<DataImage> images = processor.evaluate(user);
+        images.stream().forEach(e -> System.out.println(e));
     }
 }

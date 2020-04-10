@@ -2,6 +2,7 @@ package org.buka29a.obj.utils;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public final class ReflectionUtils {
         }
     }
 
-    public static Object setType(Object value, Class type) {
+    public static Object setType(Object value, Class<?> type) {
         if (value.getClass().isAssignableFrom(type)) {
             return value;
         } else if (type.equals(String.class)) {
@@ -67,5 +68,15 @@ public final class ReflectionUtils {
             }
         }
         return instance;
+    }
+
+    public static <A extends Annotation> A getAnnotation(Object object, Class<A> annotation) {
+        A clazz = null;
+        if (object instanceof Field) {
+            clazz = ((Field) object).getAnnotation(annotation);
+        } else {
+            clazz = object.getClass().getAnnotation(annotation);
+        }
+        return clazz;
     }
 }
